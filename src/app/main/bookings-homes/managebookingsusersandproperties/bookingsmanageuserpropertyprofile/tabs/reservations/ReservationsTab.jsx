@@ -492,7 +492,7 @@ function ReservationsTab({ merchant }) {
 			variants={container}
 			initial="hidden"
 			animate="show"
-			className="w-full"
+			className="w-full p-12 sm:p-16 md:p-24"
 		>
 			<Paper
 				component={motion.div}

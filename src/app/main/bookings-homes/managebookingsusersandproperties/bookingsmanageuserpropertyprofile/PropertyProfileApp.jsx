@@ -283,7 +283,7 @@ function PropertyProfileApp() {
 				</div>
 			}
 			content={
-				<div className="flex flex-auto justify-center w-full max-w-5xl mx-auto p-24 sm:p-32">
+				<div className="flex flex-auto justify-center w-full mx-auto px-12 py-0">
 					{selectedTab === 0 && <AboutTab merchant={merchant} />}
 					{selectedTab === 1 && <TimelineTab merchant={merchant} />}
 					{selectedTab === 2 && <ReservationsTab merchant={merchant} />}

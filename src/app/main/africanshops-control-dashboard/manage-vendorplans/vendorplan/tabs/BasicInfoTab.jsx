@@ -251,7 +251,7 @@ function BasicInfoTab() {
 									fullWidth
 									type="number"
 									InputProps={{
-										startAdornment: <InputAdornment position="start">$</InputAdornment>
+										startAdornment: <InputAdornment position="start">₦</InputAdornment>
 									}}
 									error={!!errors.price}
 									helperText={errors?.price?.message || 'Price for product storage per month'}
@@ -301,6 +301,32 @@ function BasicInfoTab() {
 									fullWidth
 									disabled
 									helperText="Auto-calculated decimal conversion of percentage commission"
+									placeholder="0.00"
+								/>
+							)}
+						/>
+					</Grid>
+
+					<Grid item xs={12} md={6}>
+						<Controller
+							name="serviceChargeFeeOption"
+							control={control}
+							render={({ field }) => (
+								<TextField
+									{...field}
+									label="Service Charge Fee"
+									id="serviceChargeFeeOption"
+									variant="outlined"
+									fullWidth
+									type="number"
+									InputProps={{
+										startAdornment: <InputAdornment position="start">₦</InputAdornment>
+									}}
+									error={!!errors.serviceChargeFeeOption}
+									helperText={
+										errors?.serviceChargeFeeOption?.message ||
+										'Fixed service charge fee for plans without commission'
+									}
 									placeholder="0.00"
 								/>
 							)}

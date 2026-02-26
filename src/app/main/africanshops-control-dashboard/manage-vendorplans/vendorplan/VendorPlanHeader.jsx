@@ -36,10 +36,11 @@ function VendorPlanHeader() {
 			...getValues(),
 			price: parseInt(getValues()?.price),
 			percetageCommissionCharge: parseInt(getValues()?.percetageCommissionCharge),
+			serviceChargeFeeOption: parseInt(getValues()?.serviceChargeFeeOption),
 			numberofproducts: parseInt(getValues()?.numberofproducts),
 			numberoffeaturedimages: parseInt(getValues()?.numberoffeaturedimages)
 		};
-		
+
 		updateShopPlans.mutate(merchantPlanValuesToSave);
 	}
 
@@ -49,6 +50,7 @@ function VendorPlanHeader() {
 			...getValues(),
 			price: parseInt(getValues()?.price),
 			percetageCommissionCharge: parseInt(getValues()?.percetageCommissionCharge),
+			serviceChargeFeeOption: parseInt(getValues()?.serviceChargeFeeOption),
 			numberofproducts: parseInt(getValues()?.numberofproducts),
 			numberoffeaturedimages: parseInt(getValues()?.numberoffeaturedimages)
 		};

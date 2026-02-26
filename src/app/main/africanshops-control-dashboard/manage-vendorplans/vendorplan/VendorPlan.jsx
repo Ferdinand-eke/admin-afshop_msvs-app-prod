@@ -48,6 +48,7 @@ function VendorPlan() {
 			percetageCommissionCharge: '',
 			percetageCommissionChargeConversion: 0,
 			price: '',
+			serviceChargeFeeOption: '',
 			support: '',
 			adsbost: '',
 			numberofproducts: '',

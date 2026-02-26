@@ -37,10 +37,10 @@ const ManagedBookingsUserListingsAppConfig = {
 					path: 'user-listings/:productId/*',
 					element: <PropertyListing />
 				},
-				{
-					path: 'user-listings/:merchantId/userproperties',
-					element: <ProfileApp />
-				},
+				// {
+				// 	path: 'user-listings/:merchantId/userproperties',
+				// 	element: <ProfileApp />
+				// },
 
 				{
 					path: 'user-listings/:merchantId/manage',
