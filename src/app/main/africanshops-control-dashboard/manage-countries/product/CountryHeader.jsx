@@ -22,6 +22,8 @@ import ProductModel from './models/ProductModel';
  * The product header.
  */
 
+const sanitizePayload = (values) => ({ ...values, vatRate: parseFloat(values.vatRate) || 0 });
+
 function CountryHeader() {
 	const firebaseauth = getAuth();
 const firebaseuser = firebaseauth.currentUser;
@@ -76,7 +78,7 @@ const firebaseuser = firebaseauth.currentUser;
 								//   isPublished: getValues().isPublished || false,
 								//   isoCode: getValues().countrylocation?.isoCode || "",
 								// };
-								updateCountryMutation.mutate(getValues());
+								updateCountryMutation.mutate(sanitizePayload(getValues()));
 							});
 						});
 					})
@@ -108,12 +110,12 @@ const firebaseuser = firebaseauth.currentUser;
 						//       isPublished: getValues().isPublished || false,
 						//       isoCode: getValues().countrylocation?.isoCode || "",
 						//     };
-						updateCountryMutation.mutate(getValues());
+						updateCountryMutation.mutate(sanitizePayload(getValues()));
 					});
 				});
 			}
 		} else {
-			updateCountryMutation.mutate(getValues());
+			updateCountryMutation.mutate(sanitizePayload(getValues()));
 		}
 	}
 
@@ -141,6 +143,7 @@ const firebaseuser = firebaseauth.currentUser;
 						phonecode: getValues().countrylocation?.phonecode,
 						// adminUserCreator: user.id || user._id || user,
 						// slug: slug,
+						vatRate: parseFloat(getValues().vatRate) || 0,
 						currency: getValues().countrylocation?.currency || 'USD',
 						flag: getValues().flag || '',
 						flagg: getValues().countrylocation?.flgg || '',
@@ -160,6 +163,7 @@ const firebaseuser = firebaseauth.currentUser;
 				phonecode: getValues().countrylocation?.phonecode,
 				// adminUserCreator: user.id || user._id || user,
 				// slug: slug,
+				vatRate: parseFloat(getValues().vatRate) || 0,
 				currency: getValues().countrylocation?.currency,
 				flag: getValues().flag || '',
 				flagg: getValues().countrylocation?.flgg || '',

@@ -1,36 +1,39 @@
-// import useCountries from '@/hooks/useCountries'
 import Select from 'react-select';
-// import useCountries from '../../apphooks/useCountries'
-// import useSellerCountries from 'app/configs/data/server-calls/countries/useCountries'
 import { City } from 'country-state-city';
 
-function LgaSelect({
-	value,
-	onChange,
-	// blgas
-	countryCode,
-	stateCode
-}) {
+function formatCityOption(option) {
+	return (
+		<div style={{ display: 'flex', flexDirection: 'column' }}>
+			<span style={{ fontWeight: 600 }}>{option.name}</span>
+			{(option.latitude || option.longitude) && (
+				<span style={{ fontSize: '11px', color: '#9ca3af' }}>
+					{option.latitude}, {option.longitude}
+				</span>
+			)}
+		</div>
+	);
+}
+
+function LgaSelect({ value, onChange, countryCode, stateCode }) {
+	const options = countryCode && stateCode ? City.getCitiesOfState(countryCode, stateCode) : [];
+	const hasRequiredCodes = Boolean(countryCode && stateCode);
+
 	return (
 		<div>
-			<label style={{ fontSize: '12px', fontWeight: '800' }}>*Shop/Business LGA/County Origin</label>
+			<p style={{ fontSize: '12px', fontWeight: '800', margin: '0 0 4px' }}>*Shop/Business LGA/County Origin</p>
 			<Select
-				placeholder="What LGA/County are you in?"
+				placeholder={hasRequiredCodes ? 'Search LGA / County…' : 'Country & state codes required'}
 				isClearable
-				// options={blgas}
-				options={City.getCitiesOfState(countryCode, stateCode)}
+				isDisabled={!hasRequiredCodes}
+				options={options}
 				value={value}
-				onChange={(value) => onChange(value)}
-				formatOptionLabel={(option) => (
-					<div className="flex flex-row items-center gap-3">
-						<div>
-							{option?.name}
-							{/* <span className='text-neutral-800 ml-1'>
-                                {option.region}
-                            </span> */}
-						</div>
-					</div>
-				)}
+				onChange={(val) => onChange(val)}
+				getOptionValue={(option) => option.name}
+				getOptionLabel={(option) => option.name}
+				noOptionsMessage={() =>
+					hasRequiredCodes ? 'No LGAs found for this state' : 'Select a country and state first'
+				}
+				formatOptionLabel={formatCityOption}
 				theme={(theme) => ({
 					...theme,
 					borderRadius: 6,

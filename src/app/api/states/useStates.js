@@ -2,7 +2,14 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router';
 import { createErrorHandler } from '../utils/errorHandler';
-import { createBState, deleteStateById, getBStates, getStateById, updateStateById } from '../apiRoutes';
+import {
+	createBState,
+	deleteStateById,
+	getBStates,
+	getStateById,
+	getStatesByCountryAdmin,
+	updateStateById
+} from '../apiRoutes';
 
 export default function useStates(params = {}) {
 	return useQuery(['states', params], () => getBStates(params), {
@@ -101,3 +108,15 @@ export function useDeleteSingleState() {
 		onError: createErrorHandler({ defaultMessage: 'Failed to delete state' })
 	});
 } // (Msvs => Done)
+
+export function useStatesByCountry(countryId, { limit = 20, offset = 0 } = {}) {
+	return useQuery(
+		['states_by_country', countryId, { limit, offset }],
+		() => getStatesByCountryAdmin({ cid: countryId, limit, offset }),
+		{
+			enabled: Boolean(countryId) && countryId !== 'new',
+			keepPreviousData: true,
+			staleTime: 30000
+		}
+	);
+}

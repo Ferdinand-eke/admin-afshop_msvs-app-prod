@@ -112,6 +112,7 @@ function LgaCounty() {
 	/**
 	 * Show Message if the requested products is not exists
 	 */
+
 	if (isError && productId !== 'new') {
 		return (
 			<motion.div
@@ -168,7 +169,7 @@ function LgaCounty() {
 								label="Basic Info"
 							/>
 						</Tabs>
-						<div className="p-16 sm:p-24 max-w-3xl">
+						<div className="p-16 sm:p-24">
 							<div className={tabValue !== 0 ? 'hidden' : ''}>
 								<BasicInfoTab />
 							</div>

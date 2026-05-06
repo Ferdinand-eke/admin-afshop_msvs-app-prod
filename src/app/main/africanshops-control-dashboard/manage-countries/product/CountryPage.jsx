@@ -55,7 +55,13 @@ function CountryPage() {
 			isFeatured: '',
 			isInOperation: '',
 			isPublished: '',
-
+			isoCode: '',
+			currency: '',
+			phonecode: '',
+			latitude: '',
+			longitude: '',
+			slug: '',
+			vatRate: 0,
 			images: [],
 			countrylocation: {}
 		},
@@ -152,39 +158,13 @@ function CountryPage() {
 								className="h-64"
 								label="Product Images"
 							/>
-							{/* <Tab
-								className="h-64"
-								label="Pricing"
-							/> */}
-							{/* <Tab
-								className="h-64"
-								label="Inventory"
-							/> */}
-							{/* <Tab
-								className="h-64"
-								label="Shipping"
-							/> */}
 						</Tabs>
-						<div className="p-16 sm:p-24 max-w-3xl">
-							<div className={tabValue !== 0 ? 'hidden' : ''}>
-								<CountryBasicInfoTab />
-							</div>
+						<div className={`p-16 sm:p-24 ${tabValue !== 0 ? 'hidden' : ''}`}>
+							<CountryBasicInfoTab />
+						</div>
 
-							<div className={tabValue !== 1 ? 'hidden' : ''}>
-								<ProductImagesTab />
-							</div>
-
-							{/* <div className={tabValue !== 2 ? 'hidden' : ''}>
-								<PricingTab />
-							</div> */}
-
-							{/* <div className={tabValue !== 3 ? 'hidden' : ''}>
-								<InventoryTab />
-							</div> */}
-
-							{/* <div className={tabValue !== 4 ? 'hidden' : ''}>
-								<ShippingTab />
-							</div> */}
+						<div className={`p-16 sm:p-24 max-w-3xl ${tabValue !== 1 ? 'hidden' : ''}`}>
+							<ProductImagesTab />
 						</div>
 					</>
 				}

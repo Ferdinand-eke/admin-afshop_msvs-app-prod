@@ -44,7 +44,7 @@ function LgaCountyHeader() {
 	}
 
 	function handleCreateProduct() {
-		console.log('LGA_Payload', getValues());
+		// console.log('LGA_Payload', getValues());
 		const lgaCountyToSave = {
 			name: getValues().lgalocation?.name,
 			latitude: getValues().lgalocation?.latitude,
@@ -60,11 +60,6 @@ function LgaCountyHeader() {
 		};
 		// return
 		addNewLga.mutate(lgaCountyToSave);
-		// createProduct(getValues())
-		// 	.unwrap()
-		// 	.then((data) => {
-		// 		navigate(`/administrations/lgas/${data.id}`);
-		// 	});
 	}
 
 	function handleRemoveProduct() {
@@ -136,15 +131,6 @@ function LgaCountyHeader() {
 					</motion.div>
 				</div>
 
-				{lgalocation && (
-					<motion.div
-						className="flex flex-col min-w-0 mx-8 sm:mx-16"
-						initial={{ x: -20 }}
-						animate={{ x: 0, transition: { delay: 0.3 } }}
-					>
-						{JSON.stringify(lgalocation)}
-					</motion.div>
-				)}
 			</div>
 			<motion.div
 				className="flex flex-1 w-full"

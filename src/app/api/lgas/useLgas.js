@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router';
 import { createErrorHandler } from '../utils/errorHandler';
-import { createBLga, deleteLgaById, getBLgas, getLgaById, updateLgaById } from '../apiRoutes';
+import { createBLga, deleteLgaById, getBLgas, getLgaById, getLgasByStateAdmin, updateLgaById } from '../apiRoutes';
 
 export default function useLgas(params = {}) {
 	return useQuery(['lgas', params], () => getBLgas(params), {
@@ -84,6 +84,18 @@ export function useLgaUpdateMutation() {
 		},
 		onError: createErrorHandler({ defaultMessage: 'Failed to update LGA' })
 	});
+}
+
+export function useLgasByState(stateId, { limit = 20, offset = 0 } = {}) {
+	return useQuery(
+		['lgas_by_state', stateId, { limit, offset }],
+		() => getLgasByStateAdmin({ stateId, limit, offset }),
+		{
+			enabled: Boolean(stateId) && stateId !== 'new',
+			keepPreviousData: true,
+			staleTime: 30000
+		}
+	);
 }
 
 /** *Delete L.G.A/County */

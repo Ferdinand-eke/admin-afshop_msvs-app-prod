@@ -181,9 +181,7 @@ export const updateCountryById = (countryFormData) => {
 
 export const createCountry = (countryFormData) => authApi().post('/buzcountries', countryFormData); // done
 
-/** *operational countries */
-export const getOperationalCountries = () => authApi().get('/buzcountries/operational'); // done
-export const getOperationalCountryById = (id) => Api().get(`/buzcountries/operationale/${id}`); // done
+
 
 /** ============================================================================================ */
 /** *Shipping Table routes */
@@ -201,6 +199,10 @@ export const deleteCountryShippingTableById = (countryFormData) => {
 export const getCountryShippingTable = (shipFrom, id) =>
 	Api().get(`/buzcountries/get-shipping-table/${shipFrom}/${id}`);
 export const deleteCountryById = (id) => authApi().delete(`/buzcountries/${id}`);
+
+/** *operational countries For End USERS &&& MERCHANTS */
+export const getOperationalCountries = () => authApi().get('/buzcountries/operational'); // done
+export const getOperationalCountryById = (id) => Api().get(`/buzcountries/operationale/${id}`); // done
 /** ***
  * ####################################################################
  * countries handling ends here
@@ -234,6 +236,13 @@ export const getBStates = (params = {}) => {
 export const getStateById = (id) => authApi().get(`/buzstates/${id}`); // done
 
 export const getStateByCountryId = (cid) => authApi().get(`/buzstates/in-country/${cid}/operational`);
+
+export const getStatesByCountryAdmin = ({ cid, limit = 20, offset = 0 }) => {
+	const queryParams = new URLSearchParams();
+	queryParams.append('limit', limit);
+	queryParams.append('offset', offset);
+	return authApi().get(`/buzstates/in-country/${cid}?${queryParams.toString()}`);
+};
 
 export const updateStateById = (stateFormData) => {
 	return authApi().put(`/buzstates/${stateFormData?.id}`, stateFormData); // done // (Msvs => Done)
@@ -279,6 +288,8 @@ export const getLgaById = (id) => authApi().get(`/buz-lgas/${id}`); // done
 export const getOperationalLgaById = (id) => Api().get(`/buz-lgas/operational/${id}`); // done
 export const getLgaByStateId = (id) => Api().get(`/buz-lgas/state/${id}`); // done
 export const getOperationalLgaByStateId = (sid) => Api().get(`/buz-lgas/in-state/${sid}/operational`); // done (Operational) //(Msvs => Done)
+export const getLgasByStateAdmin = ({ stateId, limit = 20, offset = 0 }) =>
+	authApi().get(`/buz-lgas/in-state/${stateId}`, { params: { limit, offset } }); // done (Admin)
 export const updateLgaById = (lgaFormData) => {
 	return authApi().put(`/buz-lgas/${lgaFormData?.id}`, lgaFormData); // done
 };
@@ -287,6 +298,27 @@ export const deleteLgaById = (id) => authApi().delete(`/buz-lgas/${id}/delete`);
 /** ***
  * ####################################################################
  * LGAs/COUNTIES handling ends here
+ * ______________________________________________________________________
+ * ####################################################################
+ */
+/** *================================================================ */
+/** ***
+ * ####################################################################
+ * Districts handling starts here  (Admin)
+ * ______________________________________________________________________
+ * ####################################################################
+ */
+export const getDistrictsByAdmin = ({ limit = 20, offset = 0 } = {}) =>
+	authApi().get('/buz-districts', { params: { limit, offset } });
+export const getDistrictsByLgaAdmin = ({ lgaId, limit = 20, offset = 0 }) =>
+	authApi().get(`/buz-districts/in-lga/${lgaId}`, { params: { limit, offset } });
+export const getDistrictByIdAdmin = (id) => authApi().get(`/buz-districts/${id}`);
+export const createDistrict = (dto) => authApi().post('/buz-districts', dto);
+export const updateDistrictById = ({ id, ...dto }) => authApi().put(`/buz-districts/${id}`, dto);
+export const deleteDistrictById = (id) => authApi().delete(`/buz-districts/${id}/delete`);
+/** ***
+ * ####################################################################
+ * Districts handling ends here
  * ______________________________________________________________________
  * ####################################################################
  */
@@ -307,7 +339,7 @@ export const updateTradehubById = (hubFormData) => {
 export const createTradehub = (hubFormData) => authApi().post('/trade-hubs', hubFormData);
 
 export const deleteTradehubById = (hubFormData) => {
-	console.log('DELETE-HUB-ID', hubFormData);
+	// console.log('DELETE-HUB-ID', hubFormData);
 	return authApi().delete(`/trade-hubs/${hubFormData}/delete`); // done
 };
 
