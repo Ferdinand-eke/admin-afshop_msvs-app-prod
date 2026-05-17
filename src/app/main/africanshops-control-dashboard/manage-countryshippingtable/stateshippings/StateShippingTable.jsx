@@ -22,19 +22,40 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 25];
 
-// Handles both a plain ObjectId string and an already-populated country object
-function resolveCountry(idOrObj, countries) {
+function resolveState(idOrObj, states) {
 	if (!idOrObj) return null;
+
 	if (typeof idOrObj === 'object') return idOrObj;
-	return countries?.find((c) => (c._id || c.id) === idOrObj) || null;
+
+	return states?.find((s) => (s._id || s.id) === idOrObj) || null;
 }
 
 function formatAmount(amount) {
 	if (amount === undefined || amount === null || amount === '') return '—';
+
 	return new Intl.NumberFormat('en-US', {
 		minimumFractionDigits: 0,
 		maximumFractionDigits: 2
 	}).format(amount);
+}
+
+function StateAvatar({ state, size = 36 }) {
+	const code = (state?.isoCode || state?.name || '?').slice(0, 2).toUpperCase();
+	return (
+		<Avatar
+			sx={{
+				width: size,
+				height: size,
+				bgcolor: 'secondary.light',
+				color: 'secondary.dark',
+				fontSize: size < 32 ? 9 : 11,
+				fontWeight: 800,
+				borderRadius: '8px'
+			}}
+		>
+			{code}
+		</Avatar>
+	);
 }
 
 function FreightBadge({ iconName, label, value, bgColor, textColor, borderColor }) {
@@ -76,7 +97,24 @@ function FreightBadge({ iconName, label, value, bgColor, textColor, borderColor 
 	);
 }
 
-function EmptyState({ hasCountry }) {
+function EmptyState({ selectedCountry, selectedState }) {
+	const hasCountry = Boolean(selectedCountry);
+	const hasState = Boolean(selectedState);
+
+	let title;
+	let message;
+
+	if (!hasCountry) {
+		title = 'Choose a country first';
+		message = 'Select a country from the dropdown above to load its states.';
+	} else if (!hasState) {
+		title = 'Choose an origin state';
+		message = `Select a state within ${selectedCountry.name} to view and manage its outbound shipping routes.`;
+	} else {
+		title = 'No routes configured yet';
+		message = `${selectedState.name} has no outbound state routes. Click "Add Route" to define freight rates to destination states.`;
+	}
+
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: 20 }}
@@ -95,7 +133,7 @@ function EmptyState({ hasCountry }) {
 					width: 96,
 					height: 96,
 					borderRadius: '50%',
-					background: 'linear-gradient(135deg, #f0f4ff 0%, #e8eaf6 100%)',
+					background: 'linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%)',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
@@ -106,7 +144,7 @@ function EmptyState({ hasCountry }) {
 					size={48}
 					color="disabled"
 				>
-					heroicons-outline:globe-alt
+					heroicons-outline:map
 				</FuseSvgIcon>
 			</Box>
 
@@ -115,33 +153,30 @@ function EmptyState({ hasCountry }) {
 				fontWeight={800}
 				gutterBottom
 			>
-				{hasCountry ? 'No routes configured yet' : 'Choose an origin country'}
+				{title}
 			</Typography>
 
 			<Typography
 				variant="body2"
 				color="text.secondary"
 				textAlign="center"
-				maxWidth={360}
+				maxWidth={380}
 			>
-				{hasCountry
-					? 'This country has no outbound shipping routes. Click "Add Shipping Route" to define freight rates to destination countries.'
-					: 'Select a country from the dropdown above to view and manage its country-to-country shipping routes.'}
+				{message}
 			</Typography>
 		</motion.div>
 	);
 }
 
-function CountryShippingTable({ selectedCountry, countries, onEditRoute }) {
+function StateShippingTable({ selectedState, selectedCountry, states, onEditRoute }) {
 	const [page, setPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(10);
 
-	const routes = useMemo(() => selectedCountry?.shippingTable || [], [selectedCountry]);
+	const routes = useMemo(() => selectedState?.state?.shippingTable || [], [selectedState]);
 
-	// Attach a resolved destination country object to each route (handles plain-ID responses)
 	const routesWithDest = useMemo(
-		() => routes.map((r) => ({ ...r, _dest: resolveCountry(r.countryToShipTo, countries) })),
-		[routes, countries]
+		() => routes.map((r) => ({ ...r, _dest: resolveState(r.stateToShipTo, states) })),
+		[routes, states]
 	);
 
 	const paginatedRoutes = useMemo(
@@ -149,10 +184,13 @@ function CountryShippingTable({ selectedCountry, countries, onEditRoute }) {
 		[routesWithDest, page, rowsPerPage]
 	);
 
-	if (!selectedCountry || routes.length === 0) {
+	if (!selectedState || routes.length === 0) {
 		return (
 			<Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-				<EmptyState hasCountry={!!selectedCountry} />
+				<EmptyState
+					selectedCountry={selectedCountry}
+					selectedState={selectedState}
+				/>
 			</Box>
 		);
 	}
@@ -186,24 +224,37 @@ function CountryShippingTable({ selectedCountry, countries, onEditRoute }) {
 						gap: 1.5
 					}}
 				>
-					{selectedCountry.flag && (
+					{selectedCountry?.flag && (
 						<Avatar
 							src={selectedCountry.flag}
-							sx={{ width: 28, height: 28, boxShadow: 1 }}
+							sx={{ width: 22, height: 22, boxShadow: 1 }}
 						/>
 					)}
+					<StateAvatar
+						state={selectedState}
+						size={28}
+					/>
 					<Typography
 						variant="body2"
 						fontWeight={600}
 						color="text.secondary"
 					>
-						Outbound shipping routes from{' '}
+						Outbound routes from{' '}
 						<Box
 							component="span"
 							sx={{ color: 'secondary.main', fontWeight: 800 }}
 						>
-							{selectedCountry.name}
+							{selectedState.name}
 						</Box>
+						{selectedCountry && (
+							<Box
+								component="span"
+								sx={{ fontWeight: 400 }}
+							>
+								{' '}
+								· {selectedCountry.name}
+							</Box>
+						)}
 					</Typography>
 
 					<Chip
@@ -224,16 +275,19 @@ function CountryShippingTable({ selectedCountry, countries, onEditRoute }) {
 						<TableHead>
 							<TableRow>
 								<TableCell sx={{ fontWeight: 800, py: 1.5, bgcolor: 'background.paper', whiteSpace: 'nowrap' }}>
-									Destination Country
+									Destination State
+								</TableCell>
+								<TableCell sx={{ fontWeight: 800, py: 1.5, bgcolor: 'background.paper', whiteSpace: 'nowrap' }}>
+									Land / Road
 								</TableCell>
 								<TableCell sx={{ fontWeight: 800, py: 1.5, bgcolor: 'background.paper', whiteSpace: 'nowrap' }}>
 									Air Freight
 								</TableCell>
 								<TableCell sx={{ fontWeight: 800, py: 1.5, bgcolor: 'background.paper', whiteSpace: 'nowrap' }}>
-									Land Freight
+									Bulk / CBM
 								</TableCell>
 								<TableCell sx={{ fontWeight: 800, py: 1.5, bgcolor: 'background.paper', whiteSpace: 'nowrap' }}>
-									Bulk / CBM
+									Express
 								</TableCell>
 								<TableCell
 									sx={{ fontWeight: 800, py: 1.5, bgcolor: 'background.paper' }}
@@ -247,7 +301,7 @@ function CountryShippingTable({ selectedCountry, countries, onEditRoute }) {
 						<TableBody>
 							{paginatedRoutes.map((route, idx) => (
 								<TableRow
-									key={route.id || idx}
+									key={route._id || route.id || idx}
 									hover
 									sx={{
 										cursor: 'pointer',
@@ -262,41 +316,34 @@ function CountryShippingTable({ selectedCountry, countries, onEditRoute }) {
 											alignItems="center"
 											spacing={1.5}
 										>
-											{route._dest?.flag ? (
-												<Avatar
-													src={route._dest.flag}
-													sx={{ width: 36, height: 36, boxShadow: 1 }}
-												/>
-											) : (
-												<Avatar
-													sx={{
-														width: 36,
-														height: 36,
-														bgcolor: 'secondary.light',
-														color: 'secondary.dark',
-														fontSize: 11,
-														fontWeight: 800
-													}}
-												>
-													{route._dest?.isoCode || '?'}
-												</Avatar>
-											)}
+											<StateAvatar state={route._dest} />
 											<Box>
 												<Typography
 													variant="body2"
 													fontWeight={700}
 												>
-													{route._dest?.name || route.countryToShipToName || 'Unknown'}
+													{route._dest?.name || route.stateToShipToName || 'Unknown'}
 												</Typography>
 												<Typography
 													variant="caption"
 													color="text.secondary"
 												>
-													{route._dest?.isoCode}
-													{route._dest?.phonecode ? ` · +${route._dest.phonecode}` : ''}
+													{route._dest?.isoCode || ''}
+													{route.distanceKm ? ` · ${route.distanceKm} km` : ''}
 												</Typography>
 											</Box>
 										</Stack>
+									</TableCell>
+
+									<TableCell sx={{ py: 2 }}>
+										<FreightBadge
+											iconName="heroicons-outline:truck"
+											label="ROAD / KG"
+											value={`₦${formatAmount(route.landKilogramFreightFee)}`}
+											bgColor="rgba(46, 125, 50, 0.08)"
+											textColor="rgb(27, 94, 32)"
+											borderColor="rgba(46, 125, 50, 0.2)"
+										/>
 									</TableCell>
 
 									<TableCell sx={{ py: 2 }}>
@@ -312,17 +359,6 @@ function CountryShippingTable({ selectedCountry, countries, onEditRoute }) {
 
 									<TableCell sx={{ py: 2 }}>
 										<FreightBadge
-											iconName="heroicons-outline:truck"
-											label="LAND / KG"
-											value={`₦${formatAmount(route.landKilogramFreightFee)}`}
-											bgColor="rgba(46, 125, 50, 0.08)"
-											textColor="rgb(27, 94, 32)"
-											borderColor="rgba(46, 125, 50, 0.2)"
-										/>
-									</TableCell>
-
-									<TableCell sx={{ py: 2 }}>
-										<FreightBadge
 											iconName="heroicons-outline:archive"
 											label="PER CBM"
 											value={`₦${formatAmount(route.perCbmFreightFee)}`}
@@ -330,6 +366,28 @@ function CountryShippingTable({ selectedCountry, countries, onEditRoute }) {
 											textColor="rgb(191, 54, 12)"
 											borderColor="rgba(230, 81, 0, 0.2)"
 										/>
+									</TableCell>
+
+									<TableCell sx={{ py: 2 }}>
+										{route.expressKilogramFreightFee !== undefined &&
+										route.expressKilogramFreightFee !== null &&
+										route.expressKilogramFreightFee !== '' ? (
+											<FreightBadge
+												iconName="heroicons-outline:lightning-bolt"
+												label="EXPRESS"
+												value={`₦${formatAmount(route.expressKilogramFreightFee)}`}
+												bgColor="rgba(123, 31, 162, 0.08)"
+												textColor="rgb(106, 27, 154)"
+												borderColor="rgba(123, 31, 162, 0.2)"
+											/>
+										) : (
+											<Typography
+												variant="caption"
+												color="text.disabled"
+											>
+												—
+											</Typography>
+										)}
 									</TableCell>
 
 									<TableCell
@@ -381,4 +439,4 @@ function CountryShippingTable({ selectedCountry, countries, onEditRoute }) {
 	);
 }
 
-export default CountryShippingTable;
+export default StateShippingTable;

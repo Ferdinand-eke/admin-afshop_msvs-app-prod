@@ -148,15 +148,13 @@ export function useCountryAddShippingTableMutation() {
 
 	return useMutation(createCountryShippingTable, {
 		onSuccess: (data) => {
-			console.log('NEW-SHIPMENT-ADD', data);
-
 			if (data?.data?.success) {
-				toast.success('country shipping table aded successfully!!');
-				toast.success(`${data?.message ? data?.message : data?.data?.message}`);
+				toast.success('Shipping route added successfully!');
 				queryClient.invalidateQueries('__countries');
+				queryClient.invalidateQueries('__countries_shippintables');
 			}
 		},
-		onError: createErrorHandler({ defaultMessage: 'Failed to add shipping table' })
+		onError: createErrorHandler({ defaultMessage: 'Failed to add shipping route' })
 	});
 }
 
@@ -167,30 +165,28 @@ export function useCountryUpdateShippingMutation() {
 	return useMutation(updateCountryShippingTableById, {
 		onSuccess: (data) => {
 			if (data?.data?.success) {
-				console.log('Updated-SHIPMENT', data?.data);
-				toast.success('country shipping table updated successfully!!');
-				// toast.success(`${data?.message ? data?.message : data?.data?.message}`);
+				toast.success('Shipping route updated successfully!');
 				queryClient.invalidateQueries('__countries');
+				queryClient.invalidateQueries('__countries_shippintables');
 			}
 		},
-		onError: createErrorHandler({ defaultMessage: 'Failed to update shipping table' })
+		onError: createErrorHandler({ defaultMessage: 'Failed to update shipping route' })
 	});
 }
 
-/** ***update Country Shipping Table  country */
+/** ***delete Country Shipping Table entry */
 export function useCountryDeleteShippingMutation() {
 	const queryClient = useQueryClient();
 
 	return useMutation(deleteCountryShippingTableById, {
 		onSuccess: (data) => {
 			if (data?.data?.success) {
-				console.log('Updated-SHIPMENT', data?.data);
-				toast.success('country shipping table deleted successfully!!');
-				// toast.success(`${data?.message ? data?.message : data?.data?.message}`);
+				toast.success('Shipping route removed successfully!');
 				queryClient.invalidateQueries('__countries');
+				queryClient.invalidateQueries('__countries_shippintables');
 			}
 		},
-		onError: createErrorHandler({ defaultMessage: 'Failed to delete shipping table' })
+		onError: createErrorHandler({ defaultMessage: 'Failed to delete shipping route' })
 	});
 }
 

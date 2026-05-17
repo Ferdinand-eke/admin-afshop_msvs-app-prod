@@ -1,21 +1,39 @@
 import { useState } from 'react';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import { Drawer } from '@mui/material';
-import CountryShippingTablesHeader from './CountryShippingTablesHeader';
-import CountryShippingTable from './CountryShippingTable';
+import StateShippingTablesHeader from './StateShippingTablesHeader';
+import StateShippingTable from './StateShippingTable';
 import NewShippingRouteDrawer from './NewShippingRouteDrawer';
 import EditShippingRouteDrawer from './EditShippingRouteDrawer';
 import { useCountriesWithShippingTable } from '../../../../api/countries/useCountries';
+import { useStateFullRecord, useStatesByCountry } from '../../../../api/states/useStates';
 
-function CountryShippingTables() {
+function StateShippingTables() {
 	const [selectedCountryId, setSelectedCountryId] = useState('');
+	const [selectedStateId, setSelectedStateId] = useState('');
 	const [newRouteOpen, setNewRouteOpen] = useState(false);
 	const [editRouteOpen, setEditRouteOpen] = useState(false);
 	const [selectedRoute, setSelectedRoute] = useState(null);
 
-	const { data: countriesData, isLoading } = useCountriesWithShippingTable();
+	const { data: countriesData, isLoading: loadingCountries } = useCountriesWithShippingTable();
 	const countries = countriesData?.data?.countries || [];
-	const selectedCountry = countries?.find((c) => c?._id || c?.id === selectedCountryId) || null;
+	const selectedCountry = countries.find((c) => (c._id || c.id) === selectedCountryId) || null;
+
+	const { data: statesData, isLoading: loadingStates } = useStatesByCountry(selectedCountryId);
+	const states = statesData?.data?.states || statesData?.data || [];
+
+	// Fetch the selected state's full record so shippingTable is always populated
+	const { data: stateFullData, isLoading: loadingStateRecord } = useStateFullRecord(selectedStateId);
+	const stateFullRecord = stateFullData?.data?.states || stateFullData?.data || null;
+
+	// Use full record for table (has shippingTable); fall back to list entry for display-only fields
+	const listState = states.find((s) => (s._id || s.id) === selectedStateId) || null;
+	const selectedState = stateFullRecord || listState;
+
+	function handleCountryChange(countryId) {
+		setSelectedCountryId(countryId);
+		setSelectedStateId('');
+	}
 
 	function handleEditRoute(route) {
 		setSelectedRoute(route);
@@ -26,17 +44,22 @@ function CountryShippingTables() {
 		<>
 			<GlobalStyles styles={() => ({ '#root': { maxHeight: '100vh' } })} />
 			<div className="w-full h-full flex flex-col">
-				<CountryShippingTablesHeader
+				<StateShippingTablesHeader
 					countries={countries}
+					states={states}
 					selectedCountryId={selectedCountryId}
-					onCountryChange={setSelectedCountryId}
+					selectedStateId={selectedStateId}
+					onCountryChange={handleCountryChange}
+					onStateChange={setSelectedStateId}
 					onAddRoute={() => setNewRouteOpen(true)}
-					isLoading={isLoading}
+					isLoading={loadingCountries}
+					loadingStates={loadingStates || loadingStateRecord}
 				/>
 
-				<CountryShippingTable
+				<StateShippingTable
+					selectedState={selectedState}
 					selectedCountry={selectedCountry}
-					countries={countries}
+					states={states}
 					onEditRoute={handleEditRoute}
 				/>
 
@@ -53,7 +76,9 @@ function CountryShippingTables() {
 					}}
 				>
 					<NewShippingRouteDrawer
+						originState={selectedState}
 						originCountry={selectedCountry}
+						states={states}
 						onClose={() => setNewRouteOpen(false)}
 					/>
 				</Drawer>
@@ -72,8 +97,9 @@ function CountryShippingTables() {
 				>
 					<EditShippingRouteDrawer
 						route={selectedRoute}
+						originState={selectedState}
 						originCountry={selectedCountry}
-						countries={countries}
+						states={states}
 						onClose={() => setEditRouteOpen(false)}
 					/>
 				</Drawer>
@@ -82,4 +108,4 @@ function CountryShippingTables() {
 	);
 }
 
-export default CountryShippingTables;
+export default StateShippingTables;

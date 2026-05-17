@@ -42,6 +42,7 @@ const StyledNavBarMobile = styled(SwipeableDrawer)(() => ({
 /**
  * The navbar style 1.
  */
+
 function NavbarStyle1() {
 	const user = useAppSelector(selectUser);
 	const dispatch = useAppDispatch();

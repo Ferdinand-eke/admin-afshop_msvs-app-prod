@@ -444,7 +444,35 @@ const navigationConfig = [
 				type: 'item',
 				icon: 'heroicons-outline:clipboard-check',
 				url: '/countryshipping/list'
-			}
+			},
+			{
+				id: 'stateshipping.list',
+				title: 'Shipping Tabel(States)',
+				type: 'item',
+				icon: 'heroicons-outline:clipboard-check',
+				url: '/countryshipping/stateshipping/list'
+			},
+			{
+				id: 'lgashipping.list',
+				title: 'Shipping Tabel(LGAs)',
+				type: 'item',
+				icon: 'heroicons-outline:clipboard-check',
+				url: '/countryshipping/lgashipping/list'
+			},
+			{
+				id: 'districtshipping.list',
+				title: 'Shipping Tabel(Districts)',
+				type: 'item',
+				icon: 'heroicons-outline:clipboard-check',
+				url: '/countryshipping/districtshipping/list'
+			},
+			// {
+			// 	id: 'countryshipping.list',
+			// 	title: 'Shipping Tabel(Countries)',
+			// 	type: 'item',
+			// 	icon: 'heroicons-outline:clipboard-check',
+			// 	url: '/countryshipping/list'
+			// }
 		]
 	},
 

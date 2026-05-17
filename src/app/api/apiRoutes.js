@@ -58,11 +58,23 @@ export function authApi() {
 			}
 
 			console.error(error);
-			toast.error(error.response && error.response.data.message ? error.response.data.message : error.message);
+
+			const rawMsg = error.response?.data?.message;
+			const isValidationArray = Array.isArray(rawMsg) && rawMsg.length > 0;
+
+			if (isValidationArray) {
+				rawMsg.forEach((msg) => {
+					const display = msg.includes(' - ') ? msg.split(' - ').slice(1).join(' - ') : msg;
+					toast.error(display);
+				});
+			} else {
+				toast.error(rawMsg || error.message);
+			}
 
 			return Promise.reject({
 				status: error?.response?.status,
-				message: error.response && error.response.data.message ? error.response.data.message : error.message
+				message: rawMsg || error.message,
+				validationErrors: isValidationArray ? rawMsg : null
 			});
 		}
 	);
@@ -165,40 +177,42 @@ export const getCountries = (params = {}) => {
 	const url = queryString ? `/buzcountries?${queryString}` : '/buzcountries';
 
 	return authApi().get(url);
-}; // done //(Msvs => Done)
+}; /** done //(Msvs => Done) */
 
 /** **operational countries */
-export const getCountriesWithShippinTable = () => Api().get('/buzcountries/with-shipping-table'); // done
+export const getCountriesWithShippinTable = () => authApi().get('/buzcountries'); // done /** done //(Msvs => Done) */
+
 
 export const getCountriesWithShippinTableExcludeOrigin = (originId) =>
-	Api().get(`/buzcountries/with-shipping-table/excluded-origin/${originId}`); // done
+	authApi().get(`/buzcountries/with-shipping-table/excluded-origin/${originId}`); // done /** done //(Msvs => Done) */
 
-export const getCountryById = (id) => authApi().get(`/buzcountries/${id}`); // done
+export const getCountryById = (id) => authApi().get(`/buzcountries/${id}`); // done /** done //(Msvs => Done) */
 
 export const updateCountryById = (countryFormData) => {
-	return authApi().put(`/buzcountries/${countryFormData?.id}`, countryFormData); // done
+	return authApi().put(`/buzcountries/${countryFormData?.id}`, countryFormData); // done /** done //(Msvs => Done) */
 };
 
-export const createCountry = (countryFormData) => authApi().post('/buzcountries', countryFormData); // done
+export const createCountry = (countryFormData) => authApi().post('/buzcountries', countryFormData); // done /** done //(Msvs => Done) */
 
 
+export const deleteCountryById = (id) => authApi().delete(`/buzcountries/${id}`);
 
 /** ============================================================================================ */
-/** *Shipping Table routes */
+/** *Shipping Table routes starts here */
+export const getCountryShippingTable = (shipFrom, id) =>
+	Api().get(`/buzcountries/get-shipping-table/${shipFrom}/${id}`);
+
 export const createCountryShippingTable = (countryFormData) =>
-	authApi().post('/buzcountries/add-shipping-table', countryFormData); // done
+	authApi().post(`/buzcountries/add-shipping-table/${countryFormData?.countryCheckOrigin}`, countryFormData); // done /** done //(Msvs => Done) */
 
 export const updateCountryShippingTableById = (countryFormData) => {
-	return authApi().put(`/buzcountries/update-shipping-table/${countryFormData?.countryToShipTo}`, countryFormData); // done
+	return authApi().put(`/buzcountries/update-shipping-table/${countryFormData?.countryToShipTo}`, countryFormData); // done /** done //(Msvs => Done) */
 };
 
 export const deleteCountryShippingTableById = (countryFormData) => {
-	return authApi().put(`/buzcountries/delete-shipping-table/${countryFormData?.countryToShipTo}`, countryFormData); // done
+	return authApi().put(`/buzcountries/delete-shipping-table/${countryFormData?.countryToShipTo}`, countryFormData); // done /** done //(Msvs => Done) */
 };
-
-export const getCountryShippingTable = (shipFrom, id) =>
-	Api().get(`/buzcountries/get-shipping-table/${shipFrom}/${id}`);
-export const deleteCountryById = (id) => authApi().delete(`/buzcountries/${id}`);
+/** *Shipping Table routes ends here */
 
 /** *operational countries For End USERS &&& MERCHANTS */
 export const getOperationalCountries = () => authApi().get('/buzcountries/operational'); // done
@@ -252,7 +266,25 @@ export const deleteStateById = (id) => authApi().delete(`/buzstates/${id}`);
 /** **operational state routes */
 export const getOperationalBStates = () => Api().get('/buzstates/operational'); // done
 export const getOperationalStateById = (id) => Api().get(`/buzstates/operational/${id}`); // done
-export const getOperationalStateByCountryId = (cid) => authApi().get(`/operational/buzstates/country/${cid}`);
+export const getOperationalStateByCountryId = (cid) => authApi().get(`/buzstates/in-country/${cid}/operational`); // done (Operational) //(Msvs => Done)
+// in-country/:cid/operational
+/** *State Shipping Table routes starts here */
+export const getStatesWithShippinTable = (countryId) =>
+	authApi().get(`/buzstates/with-shipping-table/country/${countryId}`);
+
+export const getStatesWithShippinTableExcludeOrigin = (originStateId, countryId) =>
+	authApi().get(`/buzstates/with-shipping-table/excluded-origin/${originStateId}/country/${countryId}`);
+
+export const createStateShippingTable = (payload) =>
+	authApi().post(`/buzstates/add-shipping-table/${payload?.stateCheckOrigin}`, payload);
+
+export const updateStateShippingTableById = (payload) =>
+	authApi().put(`/buzstates/update-shipping-table/${payload?.stateToShipTo}`, payload);
+
+export const deleteStateShippingTableById = (payload) =>
+	authApi().put(`/buzstates/delete-shipping-table/${payload?.stateToShipTo}`, payload);
+/** *State Shipping Table routes ends here */
+
 /** ***
  * ####################################################################
  * states handling ends here
